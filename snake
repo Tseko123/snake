@@ -1,0 +1,91 @@
+//променливи
+int i =1 ;
+int X_SPEED = 5;
+int Y_SPEED = 5;
+int iSNAKE_SIZE = 10;
+int headX = 20;
+int headY = 20;
+
+final int SNAKE_SIZE=30;
+
+int applex= (round(random(100))+10)+80;
+int appley= (round(random(100))+10)+80;
+
+void setup()
+{
+  //размер 
+  size(700, 700);
+}
+
+void draw()
+{
+  //цветове 
+  background(50);
+  fill(#A8CE02);
+  moveSnake();
+  //прозорец 
+  if (headX >= 700 || headX <= 0)
+  {
+    background(#F50800);
+  }
+
+  
+  if (headY >= 700 || headY <= 0)
+  {
+    //като загубиш цвят 
+    background(#F50800);
+  }
+
+  fill(#47F702);
+  stroke(0);
+  rect(applex, appley, 8, 8);
+}
+//контроли
+void moveSnake()
+{
+  if (keyCode == RIGHT)
+  {
+    drawSnakeX();
+    headX += X_SPEED;
+  } else if (keyCode == LEFT)
+  {
+    drawSnakeX();
+    headX -= X_SPEED;
+  } else if (keyCode == UP)
+  {
+    drawSnakeY();
+    headY -= Y_SPEED;
+  } else if (keyCode == DOWN)
+  {
+    drawSnakeY();
+    headY += Y_SPEED;
+  }
+}
+
+void drawSnakeX()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if (keyCode == RIGHT)
+    {
+      ellipse(headX - iSNAKE_SIZE, headY, SNAKE_SIZE, SNAKE_SIZE);
+    } else if (keyCode == LEFT)
+    {
+      ellipse(headX + iSNAKE_SIZE, headY, SNAKE_SIZE, SNAKE_SIZE);
+    }
+  }
+}
+
+void drawSnakeY()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if (keyCode == UP)
+    {
+      ellipse(headX, headY + iSNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE);
+    } else if (keyCode == DOWN)
+    {
+      ellipse(headX, headY - iSNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE);
+    }
+  }
+}
