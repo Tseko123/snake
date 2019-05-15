@@ -1,91 +1,188 @@
-//променливи
-int i =1 ;
-int X_SPEED = 5;
-int Y_SPEED = 5;
-int iSNAKE_SIZE = 10;
-int headX = 20;
-int headY = 20;
+snake test;
+food food1;
+int highScore;
 
-final int SNAKE_SIZE=30;
-
-int applex= (round(random(100))+10)+80;
-int appley= (round(random(100))+10)+80;
-
-void setup()
-{
-  //размер 
-  size(700, 700);
-}
-
-void draw()
-{
-  //цветове 
-  background(50);
-  fill(#A8CE02);
-  moveSnake();
-  //прозорец 
-  if (headX >= 700 || headX <= 0)
-  {
-    background(#F50800);
-  }
-
+void setup(){
+  size(1000, 600);
+  frameRate(14);
+  test = new snake();
+  food1 = new food();
+  rectMode(CENTER);
+  textAlign(CENTER, CENTER);
   
-  if (headY >= 700 || headY <= 0)
-  {
-    //като загубиш цвят 
-    background(#F50800);
-  }
-
-  fill(#47F702);
-  stroke(0);
-  rect(applex, appley, 8, 8);
+  highScore = 0;
 }
-//контроли
-void moveSnake()
-{
-  if (keyCode == RIGHT)
-  {
-    drawSnakeX();
-    headX += X_SPEED;
-  } else if (keyCode == LEFT)
-  {
-    drawSnakeX();
-    headX -= X_SPEED;
-  } else if (keyCode == UP)
-  {
-    drawSnakeY();
-    headY -= Y_SPEED;
-  } else if (keyCode == DOWN)
-  {
-    drawSnakeY();
-    headY += Y_SPEED;
+
+
+
+void draw(){
+  background(#FFFFFF);
+  drawScoreboard();
+  
+  test.move();
+  test.display();
+  food1.display();
+  
+  
+  if( dist(food1.xpos, food1.ypos, test.xpos.get(0), test.ypos.get(0)) < test.sidelen ){
+    food1.reset();
+    test.addLink();
+  }
+  
+  if(test.len > highScore){
+    highScore= test.len;
   }
 }
 
-void drawSnakeX()
-{
-  for (int i = 0; i < 3; i++)
-  {
-    if (keyCode == RIGHT)
-    {
-      ellipse(headX - iSNAKE_SIZE, headY, SNAKE_SIZE, SNAKE_SIZE);
-    } else if (keyCode == LEFT)
-    {
-      ellipse(headX + iSNAKE_SIZE, headY, SNAKE_SIZE, SNAKE_SIZE);
+
+void keyPressed(){
+  if(key == CODED){
+    if(keyCode == LEFT){
+      test.dir = "left";
+    }
+    if(keyCode == RIGHT){
+      test.dir = "right";
+    }
+    if(keyCode == UP){
+      test.dir = "up";
+    }
+    if(keyCode == DOWN){
+      test.dir = "down";
     }
   }
 }
 
-void drawSnakeY()
-{
-  for (int i = 0; i < 3; i++)
-  {
-    if (keyCode == UP)
-    {
-      ellipse(headX, headY + iSNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE);
-    } else if (keyCode == DOWN)
-    {
-      ellipse(headX, headY - iSNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE);
+
+void drawScoreboard(){
+  // скор борд
+  
+  fill(#0A0909);
+  textSize(65);
+  text( "Snake Game", width/2, 80);
+  
+  
+  
+  //таблица с резултат
+  stroke(179, 140, 198);
+  fill(#050505);
+  rect(90, 70, 160, 80);
+  fill(#FFFCFC);
+  textSize(17);
+  text( "резултат: " + test.len, 70, 50);
+  
+  fill(#FFFCFC);
+  textSize(17);
+  text( "най-висок: " + highScore, 70, 70);
+}
+
+class food{
+  
+  // променлива
+  float xpos, ypos;
+  
+  
+  
+  //плод 
+  food(){
+    xpos = random(100, width - 100);
+    ypos = random(100, height - 100);
+  }
+  
+  
+  // функции
+ void display(){
+   
+   fill(#FF0000);
+   ellipse(xpos, ypos,17,17);
+ }
+ 
+ 
+ void reset(){
+    xpos = random(100, width - 100);
+    ypos = random(100, height - 100);
+ }   
+}
+
+class snake{
+  
+  //променливи
+  int len;
+  float sidelen;
+  String dir; 
+  ArrayList <Float> xpos, ypos;
+  
+  // конструктор
+  snake(){
+    len = 1;
+    sidelen = 17;
+    dir = "right";
+    xpos = new ArrayList();
+    ypos = new ArrayList();
+    xpos.add( random(width) );
+    ypos.add( random(height) );
+  }
+  
+  // функиции
+  
+  
+  void move(){
+   for(int i = len - 1; i > 0; i = i -1 ){
+    xpos.set(i, xpos.get(i - 1));
+    ypos.set(i, ypos.get(i - 1));  
+   } 
+   if(dir == "left"){
+     xpos.set(0, xpos.get(0) - sidelen);
+   }
+   if(dir == "right"){
+     xpos.set(0, xpos.get(0) + sidelen);
+   }
+   
+   if(dir == "up"){
+     ypos.set(0, ypos.get(0) - sidelen);
+  
+   }
+   
+   if(dir == "down"){
+     ypos.set(0, ypos.get(0) + sidelen);
+   }
+   xpos.set(0, (xpos.get(0) + width) % width);
+   ypos.set(0, (ypos.get(0) + height) % height);
+   
+    // когато се удариш да се махат точките
+    if( checkHit() == true){
+      len = 1;
+      float xtemp = xpos.get(0);
+      float ytemp = ypos.get(0);
+      xpos.clear();
+      ypos.clear();
+      xpos.add(xtemp);
+      ypos.add(ytemp);
     }
   }
+  
+  
+  
+  void display(){
+    for(int i = 0; i <len; i++){
+      stroke(179, 140, 198);
+      fill(100, 0, 100, map(i-1, 0, len-1, 250, 50));
+      rect(xpos.get(i), ypos.get(i), sidelen, sidelen);
+    }  
+  }
+  
+  
+  void addLink(){
+    xpos.add( xpos.get(len-1) + sidelen);
+    ypos.add( ypos.get(len-1) + sidelen);
+    len++;
+  }
+  
+   boolean checkHit(){
+    for(int i = 1; i < len; i++){
+     if( dist(xpos.get(0), ypos.get(0), xpos.get(i), ypos.get(i)) < sidelen){
+       return true;
+     } 
+    } 
+    return false;
+   } 
 }
